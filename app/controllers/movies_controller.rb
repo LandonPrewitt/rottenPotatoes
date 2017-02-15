@@ -41,5 +41,11 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
+  
+  helper do
+    def my_func(cls)
+      return params[:bubble] == cls ? 'hilite' : nil
+    end
+  end
 
 end
