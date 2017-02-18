@@ -11,7 +11,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = ['G', 'PG', 'PG-13', 'R']
+    
+    @movies = Movie.all.order(params[:bubble])
+    if params[:ratings]
+      @movies = Movie.where(:rating => params[:ratings].keys).find(:all, :order => (params[:bubble]))
+    end
   end
 
   def new
@@ -45,6 +50,8 @@ class MoviesController < ApplicationController
   helper do
     def my_func(cls)
       return params[:bubble] == cls ? 'hilite' : nil
+      
+      
     end
   end
 
