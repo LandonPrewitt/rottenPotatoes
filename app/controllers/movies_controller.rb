@@ -13,10 +13,49 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = ['G', 'PG', 'PG-13', 'R']
     
-    @movies = Movie.all.order(params[:bubble])
-    if params[:ratings]
-      @movies = Movie.where(:rating => params[:ratings].keys).find(:all, :order => (params[:bubble]))
+    redirect = false
+    
+    if params[:bubble]
+      @bubble = params[:bubble]
+      session[:bubble] = params[:bubble]
+    elsif session[:bubble]
+      @bubble = session[:bubble]
+      redirect = true
+    else
+      @bubble = nil
     end
+    
+    if params[:commit] == 'Refresh' and params[:ratings].nil?
+      @ratings = nil
+      session[:ratings] = nil
+    elsif params[:ratings]
+      @ratings = params[:ratings]
+      session[:ratings] = params[:ratings]
+    elsif session[:ratings]
+      @ratings = session[:ratings]
+      redirect = true
+    else
+      @ratings = nil
+    end
+
+    if redirect
+      flash.keep
+      redirect_to movies_path :bubble=>@bubble, :ratings=>@ratings
+    end
+
+    
+    if @ratings and @bubble 
+      @movies = Movie.where(:rating => @ratings.keys).order(@bubble)
+    elsif @ratings
+      @movies = Movie.where(:rating => @ratings.keys)
+    elsif @bubble
+      @movies = Movie.order(@bubble)
+    else 
+      @movies = Movie.all
+    end
+    
+   
+    
   end
 
   def new
